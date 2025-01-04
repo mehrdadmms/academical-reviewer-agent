@@ -42,6 +42,7 @@
 4. **Run article generation**: <br>
     Go inside the code (again, I know. need it?, add it yourself) and make sure to update the following:
     - The task should be updated based on your research theme and subjects related to the theme that must be critiqued.
+    - Update the subtopics based on your research theme.
     - Replace the current list of refereneces with the list of references that you have and downloaded and saved in the ./pdfs 
     - Update `word_goal` and `total_repeats`. also make sure to update word count in the task text both in `main` function and `iterative_review_generation` function
     ```bash
