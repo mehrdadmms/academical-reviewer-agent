@@ -21,3 +21,11 @@
     ```bash
     pip3 install -r requirements.txt
     ```
+
+4. **Add OpenAI API Key**:
+    ```bash
+    export OPENAI_API_KEY=<your-api-key>
+    ```
+
+
+
