@@ -66,10 +66,12 @@ def main():
     if not pdf_files:
         print("No PDF files found in the ./pdf folder.")
         return
+    
+    batch_size = 5
 
-    for i in range(0, pdf_count, 5):
-        batch = pdf_files[i:i+5]
-        output_file = os.path.join(output_folder, f"extracted_knowledge_{i//5 + 1}.txt")
+    for i in range(0, pdf_count, batch_size):
+        batch = pdf_files[i:i+batch_size]
+        output_file = os.path.join(output_folder, f"extracted_knowledge_{i//batch_size + 1}.txt")
 
         with open(output_file, "w", encoding="utf-8") as out_file:
             for file_name in batch:
