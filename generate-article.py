@@ -92,6 +92,7 @@ def main():
     17. All of the references available in the previous iteration and arguments made based on them must remain in the current iteration.
     18. The final review should be 2500 words long.
     19. Ensure each section of the review (introduction, body, and conclusion) is expanded meaningfully to achieve the 2500-word target.
+    20. If there's one author use APA formatting which is name and date for in text cite and reference list, if there are multiple authors use first author's name and et al. in text cite.
 
     Example work: 
         Heterogenous defining of social entrepreneurship:
