@@ -67,7 +67,7 @@ def main():
         print("No PDF files found in the ./pdf folder.")
         return
     
-    batch_size = 5
+    batch_size = 7
 
     for i in range(0, pdf_count, batch_size):
         batch = pdf_files[i:i+batch_size]
