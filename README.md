@@ -24,7 +24,7 @@
 
 4. **Add OpenAI API Key**:
     ```bash
-    pexport OPENAI_API_KEY=<your-api-key>
+    export OPENAI_API_KEY=<your-api-key>
     ```
 
 
