@@ -60,7 +60,7 @@
 # Things to keep in mind
 - Sometimes LLM goes crazy just rerun it
 - Sometimes the final output has less cites that was originally given, this means that the cite you added might not be related to the others or didn't quite fit in with the whole thing. I had 21 cites but LLM always used 20 because one was not that relevant.
-- Need more text? add more cites
+- Need more text? add more cites, subtopics and add more sections to the template
 
 # Some results to show off 
 ## 100% AI generated article with 0% plagiarism <br>
