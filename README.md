@@ -33,8 +33,8 @@
     ```
 2. **Download all the reference PDFs that you want use as source for your critical review and save them in the ./pdfs folder**
 3. **Run knowledge generation**: <br>
-    This code is slow and inefficient. takes a life time to go through the whole thing. Have a problem with it? make it faster yourself :)
-    took around 40min to parse through 20 pdfs which was 27mb of information, so go watch a movie or something.
+    This code is slow and inefficient. takes a life time to go through the whole thing. Have a problem with it? make it faster yourself :) <br>
+    took around 40min to parse through 20 pdfs which was 27mb of information, so go watch a movie or something. <br>
     Go inside the code (yes I know about environment varibles, while at it maybe you can do it) and config `batch_size`. I found out that having 5 to 10 articles in one batch is good. so for example if you have 21 articles have batches of 7. More articles in one batch might lead to token limitation and less feels too low. 
     ```bash
     python3 pdf2knowledge.py  
