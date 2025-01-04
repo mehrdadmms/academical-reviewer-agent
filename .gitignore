@@ -1,0 +1,6 @@
+/venv
+*.pdf
+*.txt
+generate-article-10-article.py
+.DS_Store
+!requirements.txtR
