@@ -55,10 +55,22 @@ def main():
 
     Task:
     Write a 2500-word critical review exploring financing a new venture. 
-    The review should focus on the strengths and weaknesses of the research theme, including venture capital, corporate venture capital, angel investment, crowdfunding, accelerators, Friends and Family, Bank Loans, grants, Strategic Partnerships, and blockchain technology in financing a new venture. 
+    The review should focus on the strengths and weaknesses of the research theme, including subtopics in "financing a new venture" research theme. 
     Use the provided knowledge to support your arguments and provide a comprehensive evaluation of the field.
 
     {{}}
+
+    Subtopics:
+    - venture capital
+    - corporate venture capital
+    - angel investment
+    - crowdfunding
+    - accelerators
+    - Friends and Family
+    - Bank Loans
+    - grants
+    - Strategic Partnerships
+    - blockchain technology 
 
     Rules:
     1. Only use knowledge provided to write.
@@ -76,11 +88,10 @@ def main():
     13. Never use cite names of authors in the text, only use in-text citations with APA format.
     14. If there are multiple sources for the same argument, use all of them, aggregated in the same sentence and cite them all using APA format.
     15. Never use the name of the article in the text, only use in-cite citations with APA format.
-    16. All references that are available in the knowledge for this iteration should be used and cited in the text.
+    16. All references that are available in the knowledge for this iteration should be used to expand the text with in-text cites.
     17. All of the references available in the previous iteration and arguments made based on them must remain in the current iteration.
     18. The final review should be 2500 words long.
-    19. The review should be structured with an introduction, body, and conclusion. Don't add Recommendations for Future Research, Expanding the Review or similat sections.
-    20. Ensure each section of the review (introduction, body, and conclusion) is expanded meaningfully to achieve the 2500-word target.
+    19. Ensure each section of the review (introduction, body, and conclusion) is expanded meaningfully to achieve the 2500-word target.
 
     Example work: 
         Heterogenous defining of social entrepreneurship:
@@ -114,6 +125,7 @@ def main():
         - Wallmeroth, J., Wirtz, P., & Groh, A. P. (2018). Venture capital, angel financing, and crowdfunding of entrepreneurial ventures: A literature review. Foundations and Trends® in Entrepreneurship, 14(1), 1-129. http://dx.doi.org/10.1561/0300000066
         - Atherton, A. (2012). Cases of start‐up financing: An analysis of new venture capitalisation structures and patterns. International Journal of Entrepreneurial Behavior & Research, 18(1), 28-47. https://doi.org/10.1108/13552551211201367
         - Stayton, J., & Mangematin, V. (2019). Seed accelerators and the speed of new venture creation. The Journal of Technology Transfer, 44, 1163-1187. https://doi.org/10.1007/s10961-017-9646-0
+       
     
     Article template:
     Introduction (15% of total {word_goal} words)
@@ -123,7 +135,7 @@ def main():
         - Outline the structure of the review.
     Body:
         - Critical Analysis (50%  of total {word_goal} words))
-            - Exaime each subtopic in detail, including venture capital, corporate venture capital, angel investment, crowdfunding, accelerators, Friends and Family, Bank Loans, grants, Strategic Partnerships, and blockchain technology.
+            - Exaime each subtopic in detail.
             - Compare studies or perspectives, identifying agreements and disagreements.
             - Critically evaluate methodologies, findings, or interpretations.
             - Discuss unresolved issues, gaps, or controversies in the literature.
