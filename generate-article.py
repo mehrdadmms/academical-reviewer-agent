@@ -1,6 +1,7 @@
 
 import openai
 import os
+from glob import glob
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -26,53 +27,53 @@ def create_retrieval_qa_chain(retriever, model_name="gpt-4o"):
     )
 
 # Function to iteratively fetch and compose the review
-def iterative_review_generation(task, qa_chain, max_iterations=10, word_goal=2000):
-    review = ""
-    words_written = 0
-    iterations = 0
-    
-    while words_written < word_goal and iterations < max_iterations:
-        prev = "" if review == "" else "The following was written in the previous iteration, use the knowledge to enrich it to reach to 2000 words: \n" + review
-        itr_task = task % prev
-        print ("\n\nitr_task: ", itr_task, "\n\n")
-        print(f"\n\nIteration {iterations}: {words_written} words written.\n\n")
-        response = qa_chain(itr_task)
-        review = response["result"]
-        # review += result + "\n"
-        words_written = len(review.split())
-        iterations += 1
+def iterative_review_generation(task, qa_chain, prv_result):
 
-        print(f"\n\nIteration {iterations}: {words_written} words written.\n\n")
+    prev = "" if prv_result == "" else "The following was written in the previous iteration, use the knowledge to enrich it to reach to 2500 words: \n" + prv_result
+    itr_task = task % prev
+    print(f"\nInput size for current iteration: {len(itr_task.split())}\n")
+    response = qa_chain(itr_task)
+    review = response["result"]
 
     return review
 
 # Main function
 def main():
-    # Input paths and task
-    knowledge_file_path = "extracted_knowledge.txt"  # Replace with your text file containing knowledge
-    output_file_path = "result.txt"        # File to save the final result
+     # Path to the folder containing extracted knowledge files
+    knowledge_folder = "extracted-knowledge"
+    knowledge_file_paths = sorted(glob(os.path.join(knowledge_folder, "extracted_knowledge_*.txt")))
+
+    if not knowledge_file_paths:
+        print("No extracted knowledge files found!")
+        return
+
+    # Output file path
+    output_file_path = "result.txt"
     task = """
+
     Task:
-    Write a 2000-word critical review exploring financing a new venture. 
-    The review should focus on the strengths and weaknesses of the research theme, including venture capital, corporate venture capital, angel investment, crowdfunding, accelerators, and blockchain technology in startup financing. 
+    Write a 2500-word critical review exploring financing a new venture. 
+    The review should focus on the strengths and weaknesses of the research theme, including venture capital, corporate venture capital, angel investment, crowdfunding, accelerators, Friends and Family, Bank Loans, grants, Strategic Partnerships, and blockchain technology in financing a new venture. 
     Use the provided knowledge to support your arguments and provide a comprehensive evaluation of the field.
 
     %s
-    
+
     Rules:
     1. Only use knowledge provided to write.
     2. Back every argument with evidence from the knowledge.
     3. Use in-text citations in APA format.
     4. Critically evaluate strengths and weaknesses of the research theme.
     5. Only write critique arguments on strengths and weaknesses of the field.
-    6. Never use cite names of authors in the text, only use in-text citations with APA format.
-    7. Do not repeat the same argument more than once.
-    8. Never use the name of the article in the text, only use in-cite citations with APA format.
-    9. Must use all of the following references that are available in the knowledge:
+    6. Never write an argument without evidence from the knowledge.
+    7. Never use cite names of authors in the text, only use in-text citations with APA format.
+    8. Do not repeat the same argument more than once, unless the source is different.
+    9. If there are multiple sources for the same argument, use all of them, aggregated in the same sentence and cite them all using APA format.
+    10. Never use the name of the article in the text, only use in-cite citations with APA format.
+    11. Must use all of the following references that are available in the knowledge:
         - Drover, W., Busenitz, L., Matusik, S., Townsend, D., Anglin, A., & Dushnitsky, G. (2017). A review and road map of entrepreneurial equity financing research: Venture capital, corporate venture capital, angel investment, crowdfunding, and accelerators. Journal of Management, 43(6), 1820–1853. https://doi.org/10.1177/0149206317690584
         - Ahluwalia, S., Mahto, R. V., & Guerrero, M. (2020). Blockchain technology and startup financing: A transaction cost economics perspective. Technological Forecasting & Social Change, 151, 119854. https://doi.org/10.1016/j.techfore.2019.119854
         - Fisch, C., Meoli, M., & Vismara, S. (2020). Does blockchain technology democratize entrepreneurial finance? An empirical comparison of ICOs, venture capital, and REITs. Technological Forecasting and Social Change, 157, 120099. https://doi.org/10.1016/j.techfore.2020.120099
-        - Boakye, E. A., Zhao, H., & Ahia, B. N. K. (2022). Emerging research on blockchain technology in finance: A conveyed evidence of bibliometric-based evaluations. Journal of High Technology Management Research, 33, 100437. https://doi.org/10.1016/j.hitech.2022.100437
+        - Boakye, E. A., Zhao, H., & Ahia, B. N. K. (2022). Emerging research on blockchainx technology in finance: A conveyed evidence of bibliometric-based evaluations. Journal of High Technology Management Research, 33, 100437. https://doi.org/10.1016/j.hitech.2022.100437
         - Röhm, P. (2018). Exploring the landscape of corporate venture capital: A systematic review of the entrepreneurial and finance literature. Management Review Quarterly, 68(3), 279–319. https://doi.org/10.1007/s11301-018-0140-z
         - Cavallo, A., Ghezzi, A., Dell'Era, C., & Pellizzoni, E. (2019). Fostering digital entrepreneurship from startup to scaleup: The role of venture capital funds and angel groups. Technological Forecasting and Social Change, 145, 24–35. https://doi.org/10.1016/j.techfore.2019.04.022
         - Gutmann, T. (2019). Harmonizing corporate venturing modes: An integrative review and research agenda. Management Review Quarterly, 69(2), 121–157. https://doi.org/10.1007/s11301-018-0148-4
@@ -85,6 +86,8 @@ def main():
         - Chua, J. H., Chrisman, J. J., Kellermanns, F., & Wu, Z. (2011). Family involvement and new venture debt financing. Journal of business venturing, 26(4), 472-488. https://doi.org/10.1016/j.jbusvent.2009.11.002
         - Riding, A., Orser, B., Spence, M., & Belanger, B. (2012). Financing new venture exporters. Small Business Economics, 38(2), 147–163. https://doi.org/10.1007/s11187-009-9259-6
         - Frid, C. J., Wyman, D. M., Gartner, W. B., & Hechavarria, D. H. (2016). Low-wealth entrepreneurs and access to external financing. International Journal of Entrepreneurial Behavior & Research, 22(4), 531-555. https://doi.org/10.1108/IJEBR-08-2015-0173
+    12. All of the references available in the previous iteration and arguments made based on them must remain in the current iteration.
+    
     Example work: 
         Heterogenous defining of social entrepreneurship:
         Firstly, as highlighted in the introduction, scholarly debate on a singular understanding of social entrepreneurship (SE) is unsettled, with the definition varying between fields.
@@ -96,17 +99,29 @@ def main():
         focused on up-to-date needs of society, whether, social, economic or environmental. To conclude, the review of this issue suggests that scholars (whether cognitively or not] agree on the fact that SE is determined by the primacy of social value creation through innovation in a particular context, by a new venture and the process of setting up a new venture for this purpose.
     """
 
+    total_repeats = 3
+    word_goal=2000
+    words_written = 0
+    result = ""
+    for repeat in range(total_repeats):
+        print(f"\n===== Starting Repeat {repeat + 1} of {total_repeats} =====\n")
+        for file_path in knowledge_file_paths:
+            print(f"\nProcessing file: {file_path}\n")
 
-    # Step 1: Create a retriever from the knowledge file
-    retriever = create_retriever_from_file(knowledge_file_path)
+            # Create a retriever for the current file
+            retriever = create_retriever_from_file(file_path)
 
-    # Step 2: Create a RetrievalQA chain
-    qa_chain = create_retrieval_qa_chain(retriever)
+            # Create a RetrievalQA chain
+            qa_chain = create_retrieval_qa_chain(retriever)
 
-    # Step 3: Use the chain to answer the task
-    # response = qa_chain(task)
-    # result = response["result"]  # Extracting the main result
-    result = iterative_review_generation(task, qa_chain)
+            # Generate the review for the current file
+            result = iterative_review_generation(task, qa_chain, result)
+            words_written = len(result.split())
+            print(f"\n\nIteration {repeat + 1} - file {file_path}: {words_written} words written.\n\n")
+        if words_written > word_goal and repeat > 1:
+            break
+
+
     # Step 4: Save the result to a text file
     with open(output_file_path, "w", encoding="utf-8") as output_file:
         output_file.write(result)

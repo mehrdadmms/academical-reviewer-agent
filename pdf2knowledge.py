@@ -44,23 +44,36 @@ def chunk_text(text, max_chunk_size=2000):
 def process_with_gpt(chunks):
     knowledge_base = []
     for chunk in chunks:
-        response = client.chat.completions.create(model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "Extract knowledge and summarize the following text:"},
-            {"role": "user", "content": chunk}
-        ])
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Extract knowledge and summarize the following text:"},
+                {"role": "user", "content": chunk}
+            ]
+        )
         knowledge_base.append(response.choices[0].message.content)
     return knowledge_base
 
 # Main function
 def main():
-    folder_path = os.getcwd()  # Current folder
-    output_file = os.path.join(folder_path, "extracted_knowledge.txt")
+    pdf_folder = os.path.join(os.getcwd(), "pdf")
+    output_folder = os.path.join(os.getcwd(), "extracted-knowledge")
+    os.makedirs(output_folder, exist_ok=True)
 
-    with open(output_file, "w", encoding="utf-8") as out_file:
-        for file_name in os.listdir(folder_path):
-            if file_name.endswith(".pdf"):
-                pdf_path = os.path.join(folder_path, file_name)
+    pdf_files = [f for f in os.listdir(pdf_folder) if f.endswith(".pdf")]
+    pdf_count = len(pdf_files)
+
+    if not pdf_files:
+        print("No PDF files found in the ./pdf folder.")
+        return
+
+    for i in range(0, pdf_count, 5):
+        batch = pdf_files[i:i+5]
+        output_file = os.path.join(output_folder, f"extracted_knowledge_{i//5 + 1}.txt")
+
+        with open(output_file, "w", encoding="utf-8") as out_file:
+            for file_name in batch:
+                pdf_path = os.path.join(pdf_folder, file_name)
 
                 print(f"Processing: {file_name}")
 
@@ -82,9 +95,7 @@ def main():
                     out_file.write(knowledge + "\n\n")
                 out_file.write("\n" + "-"*50 + "\n\n")
 
-    print(f"Knowledge has been extracted and saved to {output_file}")
+        print(f"Batch {i//5 + 1} knowledge saved to {output_file}")
 
-# Run the script
 if __name__ == "__main__":
     main()
-
