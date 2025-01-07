@@ -29,7 +29,7 @@
 # Use the Critical reviewer AI Agent
 1. **Create a folder call pdfs**:
     ```bash
-    mkdir pdfs
+    mkdir pdf
     ```
 2. **Download all the reference PDFs that you want use as source for your critical review and save them in the ./pdfs folder**
 3. **Run knowledge generation**: <br>
