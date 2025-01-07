@@ -28,11 +28,8 @@ def create_retrieval_qa_chain(retriever, model_name="gpt-4o"):
 
 # Function to iteratively fetch and compose the review
 def iterative_review_generation(task, qa_chain, prv_result):
-
-    prev = "" if prv_result == "" else "The following was written in the previous iteration, use the knowledge to enrich it to reach to 2500 words: \n" + prv_result
-    itr_task = task.format(prev)
-    print(f"Input size for current iteration: {len(itr_task.split())}")
-    response = qa_chain(itr_task)
+    print(f"Input size for current iteration: {len(task.split())}")
+    response = qa_chain(task)
     review = response["result"]
 
     return review
@@ -50,107 +47,61 @@ def main():
     # Output file path
     output_file_path = "result.txt"
     word_goal=2000
-    total_repeats = 3
+    total_repeats = 1
     task = f"""
 
     Task:
-    Write a 2500-word critical review exploring financing a new venture. 
-    The review should focus on the strengths and weaknesses of the research theme, including subtopics in "financing a new venture" research theme. 
-    Use the provided knowledge to support your arguments and provide a comprehensive evaluation of the field.
+    You're a prompt engineer working exclusively with voice AI. 
+    - For each of the survey types create a AI Assistant prompt that prompts a voice AI Agent to act as an interviewer.
+    In the end give me a list of all the survey types and their corresponding prompts.
+
 
     {{}}
 
-    Subtopics:
-    - venture capital
-    - corporate venture capital
-    - angel investment
-    - crowdfunding
-    - accelerators
-    - Friends and Family
-    - Bank Loans
-    - grants
-    - Strategic Partnerships
-    - blockchain technology 
+    Survey types:
+        1. **Questionnaires**  
+            - Closed-forced choice
+            - Open-broad
+            - General-focused
+            - Specific-focused
+            - Factual
+            - Hypothetical
+            - Judgmental
+            - Comparative
+            - Neutral
+            - Leading 
+            - Blaring 
+            - Request for suggestions
+            - Request for questions  
+
+        2. **Surveys**  
+            - Questionnaires
+            - Structured interviews  
+
+        3. **Structured Interviews**
+            - Conducted in person
+            - By phone
+            - Through various communication technologies
 
     Rules:
     1. Only use knowledge provided to write.
-    2. Back every argument with evidence from the knowledge.
-    3. Use in-text citations in APA format.
-    4. Critically evaluate strengths and weaknesses of the research theme.
-    5. Introduce at least two new critique arguments in each iteration, supported by evidence from the knowledge.
-    6. Identify gaps or weaknesses in the previous iteration and enrich them with new insights from the knowledge sources.
-    7. Address interdependencies and contextual suitabilities.
-    8. Avoid repeating the same argument without elaboration or alternative perspectives.
-    9. Explore alternative critiques or perspectives for each argument to enrich the review.
-    10. All arguments made in previous iterations must remain in the current iteration, with further enrichment and evidence added where appropriate.
-    11. Only write critique arguments on strengths and weaknesses of the field.
-    12. Never write an argument without evidence from the knowledge.
-    13. Never use cite names of authors in the text, only use in-text citations with APA format.
-    14. If there are multiple sources for the same argument, use all of them, aggregated in the same sentence and cite them all using APA format.
-    15. Never use the name of the article in the text, only use in-cite citations with APA format.
-    16. All references that are available in the knowledge for this iteration should be used to expand the text with in-text cites.
-    17. All of the references available in the previous iteration and arguments made based on them must remain in the current iteration.
-    18. The final review should be 2500 words long.
-    19. Ensure each section of the review (introduction, body, and conclusion) is expanded meaningfully to achieve the 2500-word target.
-    20. If there's one author use APA formatting which is name and date for in text cite and reference list, if there are multiple authors use first author's name and et al. in text cite.
+    2. Use example work as a reference and enrich it based on the knowledge provided and tailor for each survey type.
+    3. Use the knowledge provided to write the prompts tailored to each survey type.
+    4. Don't give me response as the interviewer agent, give me the prompt that must be fed to the AI agent as system prompt so later on it can interview the user.
+    5. For each survey type, provide a set of rules specific to that survey type based on the knowledge provided that the interviewer agent must follow.
+    6. Minimum set of rules per survey type is 5.
+    7. Apart from survey type rules add 5 general rules that the interviewer agent must follow.
+    8. The end result must have at least 10 rules (general and survey type specific) for each survey type.
 
     Example work: 
-        Heterogenous defining of social entrepreneurship:
-        Firstly, as highlighted in the introduction, scholarly debate on a singular understanding of social entrepreneurship (SE) is unsettled, with the definition varying between fields.
-        Huybrehts & Nichols (2012) argue that SE is highly contextual, therefore its understanding varies between the ideologies and goals of the institutions that foster a particular definition.
-        This is accurate when contrasted with other scholarly works. For example, in relation to social innovation, SE is understood as the creation of social value through pattern-breaking change or innovation in products, services, organization or production (Phillips et al., 2014).
-        Whereas, in relation to opportunity recognition, a process to discover, define and export opportunities in order to create social wealth through new ventures in an innovative way (Yitshaki & Kropp, 2019). In relation to green innovation and sustainable development, Galindo-Martin et al. (2020) view on entrepreneurship is not fully accurate because it sees it as an action-creating process [within an already existing business] and not new venture creation. Nevertheless, their understanding still portrays SE as a process in which social value is seen as a sustainable development created using (green] innovative methods by the entrepreneur. In contrast, when defining SE in relation to effectuation, it is the creation of a venture that has social value creation as a goal, with the means available (Comer & Ho,
-        2010).
-        The above examples suggest that SE is a diverse and complex matter because it is defined differently based on the context it is established in. Furthermore, the Triple Bottom Line Theory of People, Planet and Profit suggests that social value could be understood in three dimensions as generating value for society, whether by providing them job opportunities, housing and food, environmentally by promoting sustainable actions across all spheres whether in businesses or amongst customers and finally economically [profit], whether it is about donating some of the profits to a charitable cause or investing all finance in the development of SE (Majid & Koe, 2012). Nevertheless, Huybrechts & Nichols (2012) provide an accurate analysis that SE, despite contextual differences, can be based upon three pillars of sociality, innovation and market orientation. This view draws a parallel with the other understandings of SE, as they all share that innovation is a seed of SE and without it, it would not operate effectively. That through innovation social value can be created. Yes, there are limitations to some views that see SE as a process of action-taking, rather than the creation of a new business to take that action, in this case, social value creation (Galindo-Martin et al., 2020). However, most definitions of SE take the primacy of social value creation [sociality] as a determinant of being socially entrepreneurial. Innovation is the catalyst for making that possible and market orientation allows the entrepreneur to be
-        focused on up-to-date needs of society, whether, social, economic or environmental. To conclude, the review of this issue suggests that scholars (whether cognitively or not] agree on the fact that SE is determined by the primacy of social value creation through innovation in a particular context, by a new venture and the process of setting up a new venture for this purpose.
-    
-    References:
-        - Drover, W., Busenitz, L., Matusik, S., Townsend, D., Anglin, A., & Dushnitsky, G. (2017). A review and road map of entrepreneurial equity financing research: Venture capital, corporate venture capital, angel investment, crowdfunding, and accelerators. Journal of Management, 43(6), 1820–1853. https://doi.org/10.1177/0149206317690584
-        - Ahluwalia, S., Mahto, R. V., & Guerrero, M. (2020). Blockchain technology and startup financing: A transaction cost economics perspective. Technological Forecasting & Social Change, 151, 119854. https://doi.org/10.1016/j.techfore.2019.119854
-        - Fisch, C., Meoli, M., & Vismara, S. (2020). Does blockchain technology democratize entrepreneurial finance? An empirical comparison of ICOs, venture capital, and REITs. Technological Forecasting and Social Change, 157, 120099. https://doi.org/10.1016/j.techfore.2020.120099
-        - Boakye, E. A., Zhao, H., & Ahia, B. N. K. (2022). Emerging research on blockchainx technology in finance: A conveyed evidence of bibliometric-based evaluations. Journal of High Technology Management Research, 33, 100437. https://doi.org/10.1016/j.hitech.2022.100437
-        - Röhm, P. (2018). Exploring the landscape of corporate venture capital: A systematic review of the entrepreneurial and finance literature. Management Review Quarterly, 68(3), 279–319. https://doi.org/10.1007/s11301-018-0140-z
-        - Cavallo, A., Ghezzi, A., Dell'Era, C., & Pellizzoni, E. (2019). Fostering digital entrepreneurship from startup to scaleup: The role of venture capital funds and angel groups. Technological Forecasting and Social Change, 145, 24–35. https://doi.org/10.1016/j.techfore.2019.04.022
-        - Gutmann, T. (2019). Harmonizing corporate venturing modes: An integrative review and research agenda. Management Review Quarterly, 69(2), 121–157. https://doi.org/10.1007/s11301-018-0148-4
-        - Brush, C. G., Edelman, L. F., & Manolova, T. S. (2012). Ready for funding? Entrepreneurial ventures and the pursuit of angel financing. Venture Capital, 14(2-3), 111–129. https://doi.org/10.1080/13691066.2012.654604
-        - Svetek, M. (2022). Signaling in the context of early-stage equity financing: Review and directions. Venture Capital, 24(1), 71–104. https://doi.org/10.1080/13691066.2022.2063092
-        - Lukkarinen, A., Teich, J. E., Wallenius, H., & Wallenius, J. (2016). Success drivers of online equity crowdfunding campaigns. Decision Support Systems, 87, 26–38. https://doi.org/10.1016/j.dss.2016.04.006
-        - Howell, S. T. (2017). Financing innovation: Evidence from R&D grants. American economic review, 107(4), 1136-1164. https://doi.org/10.1257/aer.20150808
-        - Hottenrott, H., Lins, E., & Lutz, E. (2017). Public subsidies and new ventures’ use of bank loans. Economics of Innovation and New Technology, 27(8), 786–808. https://doi.org/10.1080/10438599.2017.1408200
-        - Plummer, L. A., Allison, T. H., & Connelly, B. L. (2016). Better together? Signaling interactions in new venture pursuit of initial external capital. Academy of Management Journal, 59(5), 1585-1604. https://doi.org/10.5465/amj.2013.0100
-        - Chua, J. H., Chrisman, J. J., Kellermanns, F., & Wu, Z. (2011). Family involvement and new venture debt financing. Journal of business venturing, 26(4), 472-488. https://doi.org/10.1016/j.jbusvent.2009.11.002
-        - Frid, C. J., Wyman, D. M., Gartner, W. B., & Hechavarria, D. H. (2016). Low-wealth entrepreneurs and access to external financing. International Journal of Entrepreneurial Behavior & Research, 22(4), 531-555. https://doi.org/10.1108/IJEBR-08-2015-0173
-        - Wong, A. Y. (2002). Angel finance: the other venture capital. Available at SSRN 941228. http://dx.doi.org/10.2139/ssrn.941228
-        - Colombo, O. (2021). The Use of Signals in New-Venture Financing: A Review and Research Agenda. Journal of Management, 47(1), 237-259. https://doi.org/10.1177/0149206320911090
-        - Bonini, S., & Capizzi, V. (2019). The role of venture capital in the emerging entrepreneurial finance ecosystem: future threats and opportunities. Venture Capital, 21(2-3), 137-175. https://doi.org/10.1080/13691066.2019.1608697
-        - Wallmeroth, J., Wirtz, P., & Groh, A. P. (2018). Venture capital, angel financing, and crowdfunding of entrepreneurial ventures: A literature review. Foundations and Trends® in Entrepreneurship, 14(1), 1-129. http://dx.doi.org/10.1561/0300000066
-        - Atherton, A. (2012). Cases of start‐up financing: An analysis of new venture capitalisation structures and patterns. International Journal of Entrepreneurial Behavior & Research, 18(1), 28-47. https://doi.org/10.1108/13552551211201367
-        - Stayton, J., & Mangematin, V. (2019). Seed accelerators and the speed of new venture creation. The Journal of Technology Transfer, 44, 1163-1187. https://doi.org/10.1007/s10961-017-9646-0
-       
-    
-    Article template:
-    Introduction (15% of total {word_goal} words)
-        - Introduce the topic and its relevance.
-        - Provide background context for the review.
-        - State the objectives of the review and questions it seeks to address.
-        - Outline the structure of the review.
-    Body:
-        - Critical Analysis (50%  of total {word_goal} words))
-            - Exaime each subtopic in detail.
-            - Compare studies or perspectives, identifying agreements and disagreements.
-            - Critically evaluate methodologies, findings, or interpretations.
-            - Discuss unresolved issues, gaps, or controversies in the literature.
-            - Assess the contextual relevance and applicability of findings.
+        You're a interviewer that ask the below questions to the interviewee, you should detect contrasts and ask for more explanation if needed. 
+        say hello first before use start the conversation and start a warmup conversation then ask questions 
+        double check the answer if the user said something that is not clear 
+        Don't make assumptions, just ask the questions and try to get a clear answer. repeat the question if you didn't get a clear answer 
+        Don't ask Irrelevant questions, just ask the questions that are related to the list of questions, if the user said something that is not related to the list of questions, guide the user to the list of questions 
+        before start let them know that they're being recorded and the need to concent to be recorded 
+        if you noticed sth strange in his answer, ask him to explain it more and confirm it with your understanding
 
-        - Synthesis and Discussion (15%  of total {word_goal} words))
-            - Integrate insights from the literature into a cohesive understanding.
-            - Discuss implications for theory, practice, or policy.
-            - Suggest areas for future research or unresolved questions.
-
-    Conclusion (20%  of total {word_goal} words))
-        - Recap the main points from the analysis and synthesis.
-        - Offer practical or theoretical recommendations based on findings.
-        - Reflect on the broader significance of the review.
     """
 
     words_written = 0
@@ -165,13 +116,20 @@ def main():
 
             # Create a RetrievalQA chain
             qa_chain = create_retrieval_qa_chain(retriever)
-
+            # task = """
+            #     give me numbered list of all the ways to write surveys to develop innovative ideas, research complex problems and design effective solutions.
+            #     then for each go into details and give me list of types in bullet points.
+            #     Only use knowledge provided to write.
+            #     don't add any new information.
+            #     don't repeat the same information.
+            #     don't explain but tell me which survays are for goups and which ones are for individuals.
+            # """
             # Generate the review for the current file
             result = iterative_review_generation(task, qa_chain, result)
             words_written = len(result.split())
             print(f"Iteration {repeat + 1} - file {file_path}: {words_written} words written.\n\n")
-        if words_written > word_goal and repeat >= 1:
-            break
+        # if words_written > word_goal and repeat >= 1:
+            # break
 
 
     # Step 4: Save the result to a text file
